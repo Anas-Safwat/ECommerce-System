@@ -1,10 +1,6 @@
 ﻿using ECommerceSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace ECommerceSystem.Infrastructure.Configurations
 {
     internal class OrderConfiguration : IEntityTypeConfiguration<Order>
@@ -12,11 +8,11 @@ namespace ECommerceSystem.Infrastructure.Configurations
 
         public void Configure(EntityTypeBuilder<Order> builder)
         {
-            // Table and PK
+            // 1) Table and key
             builder.ToTable("Orders");
             builder.HasKey(o => o.Id);
 
-            //Properties
+            //2) Property Constraints
             builder.Property(o => o.TotalAmount)
                 .HasPrecision(18, 2);
 
@@ -28,7 +24,7 @@ namespace ECommerceSystem.Infrastructure.Configurations
                 .IsRequired()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            //Relationships
+            //3) Navigation and On Deleting
             builder.HasMany(o => o.OrderItems)
                 .WithOne(oi => oi.Order)
                 .HasForeignKey(oi => oi.OrderId)

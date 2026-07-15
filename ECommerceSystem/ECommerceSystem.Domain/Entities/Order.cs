@@ -1,8 +1,4 @@
 ﻿using ECommerceSystem.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace ECommerceSystem.Domain.Entities
 {
     public class Order
@@ -14,7 +10,7 @@ namespace ECommerceSystem.Domain.Entities
 
         //Navigation Properties
         public Guid UserId { get; set; }
-        public User User { get; set; }
+        public User User { get; set; } = null!;
 
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }

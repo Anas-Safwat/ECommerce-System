@@ -1,4 +1,6 @@
+using ECommerceSystem.Application.Interfaces;
 using ECommerceSystem.Infrastructure.Data;
+using ECommerceSystem.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 namespace ECommerceSystem.Api
 {
@@ -15,6 +17,7 @@ namespace ECommerceSystem.Api
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddOpenApi();
 
             var app = builder.Build();

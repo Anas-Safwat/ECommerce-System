@@ -1,21 +1,17 @@
 ﻿using ECommerceSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace ECommerceSystem.Infrastructure.Configurations
 {
     internal class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
-            //Table and PK
+            // 1) Table and key
             builder.ToTable("Products");
             builder.HasKey(p => p.Id);
 
-            //Properties
+            //2) Property Constraints
             builder.Property(p => p.Name)
                 .IsRequired()
                 .HasMaxLength(50);
@@ -32,7 +28,7 @@ namespace ECommerceSystem.Infrastructure.Configurations
                 .IsRequired()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            //Relationships
+            //3) Navigation and On Deleting
             builder.HasMany(p => p.Categories)
                 .WithMany(c => c.Products)
                 .UsingEntity<ProductCategory>();

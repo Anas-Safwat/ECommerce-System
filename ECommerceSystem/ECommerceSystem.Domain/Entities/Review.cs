@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ECommerceSystem.Domain.Entities
+﻿namespace ECommerceSystem.Domain.Entities
 {
     public class Review
     {
@@ -13,13 +9,13 @@ namespace ECommerceSystem.Domain.Entities
 
         //Navigation Properties
         public int ProductId { get; set; }
-        public Product Product { get; set; }
+        public Product Product { get; set; } = null!;
 
         public Guid UserId { get; set; }
-        public User User { get; set; }
+        public User User { get; set; } = null!;
 
-        
-        
+
+
 
     }
 }

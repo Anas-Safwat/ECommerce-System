@@ -1,7 +1,4 @@
 ﻿using ECommerceSystem.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace ECommerceSystem.Infrastructure.Configurations
@@ -10,9 +7,11 @@ namespace ECommerceSystem.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<Review> builder)
         {
+            // 1) Table and key
             builder.ToTable("Reviews");
             builder.HasKey(r => r.Id);
 
+            //2) Property Constraints
             builder.Property(r => r.Rating)
                 .IsRequired();
 
