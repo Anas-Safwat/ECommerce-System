@@ -1,0 +1,17 @@
+using ECommerceSystem.Application.DTOs.Order;
+using FluentValidation;
+
+namespace ECommerceSystem.Application.Validators.Order
+{
+    public class CreateOrderRequestValidator : AbstractValidator<CreateOrderRequest>
+    {
+        public CreateOrderRequestValidator()
+        {
+            RuleFor(x => x.Items)
+                .NotEmpty().WithMessage("An order must contain at least one item.");
+
+            RuleForEach(x => x.Items)
+                .SetValidator(new CreateOrderItemRequestValidator());
+        }
+    }
+}

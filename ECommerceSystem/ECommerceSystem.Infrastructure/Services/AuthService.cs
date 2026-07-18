@@ -121,7 +121,7 @@ namespace ECommerceSystem.Infrastructure.Services
                new Claim(JwtRegisteredClaimNames.Email, user.Email),
                new Claim(ClaimTypes.Role, user.Role.ToString()),
                new Claim(JwtRegisteredClaimNames.Iat,
-               DateTimeOffset.UtcNow.ToString(),
+               DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                ClaimValueTypes.Integer64
                )
            };

@@ -1,7 +1,10 @@
+using ECommerceSystem.Api.Filters;
+using ECommerceSystem.Application.DTOs.Auth;
 using ECommerceSystem.Application.Interfaces;
 using ECommerceSystem.Infrastructure.Data;
 using ECommerceSystem.Infrastructure.Repositories;
 using ECommerceSystem.Infrastructure.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,13 +19,39 @@ namespace ECommerceSystem.Api
 
             // Add services to the container.
             
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<ValidationFilter>();
+            });
+
+            builder.Services.AddSwaggerGen();
+
+
+            // Disable built-in model validation to let FluentValidation handle it
+            builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+
+            // Register all FluentValidation validators from the Application assembly
+            builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IReviewService, ReviewService>();
+            builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+
+            builder.Services.AddAutoMapper(cfg => {
+                cfg.AddProfile<ECommerceSystem.Application.Mappings.MappingProfile>();
+            });
+
             builder.Services.AddOpenApi();
 
             builder.Services.AddAuthentication(options =>
@@ -39,8 +68,17 @@ namespace ECommerceSystem.Api
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!)),
+                    RoleClaimType = System.Security.Claims.ClaimTypes.Role
                 };
+            });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("SellerOnly", policy => policy.RequireRole("Seller"));
+                options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer"));
+                options.AddPolicy("SellerOrAdmin", policy => policy.RequireRole("Seller", "Admin"));
             });
 
             var app = builder.Build();
@@ -48,9 +86,9 @@ namespace ECommerceSystem.Api
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
-
             app.UseHttpsRedirection();
 
 
