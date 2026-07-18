@@ -1,4 +1,4 @@
-﻿using ECommerceSystem.Application.Interfaces;
+using ECommerceSystem.Application.Interfaces;
 using ECommerceSystem.Domain.Entities;
 using ECommerceSystem.Infrastructure.Data;
 namespace ECommerceSystem.Infrastructure.Repositories
@@ -18,6 +18,7 @@ namespace ECommerceSystem.Infrastructure.Repositories
         private IRepository<Order, int>? _orders;
         private IRepository<Category, int>? _categories;
         private IRepository<CartItem, int>? _cartItems;
+        private IRepository<RefreshToken, Guid>? _refreshTokens;
 
         // Lazy Initialization
         public IRepository<User, Guid> Users => _users ??= new Repository<User,Guid>(_context);
@@ -27,6 +28,7 @@ namespace ECommerceSystem.Infrastructure.Repositories
         public IRepository<Order, int> Orders => _orders ??= new Repository<Order, int>(_context);
         public IRepository<Category, int> Categories => _categories ??= new Repository<Category, int>(_context);
         public IRepository<CartItem, int> CartItems => _cartItems ??= new Repository<CartItem, int>(_context);
+        public IRepository<RefreshToken, Guid> RefreshTokens => _refreshTokens ??= new Repository<RefreshToken, Guid>(_context);
        
         public async Task<int> SaveChangesAsync()
         {

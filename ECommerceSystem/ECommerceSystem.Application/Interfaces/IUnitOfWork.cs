@@ -1,4 +1,4 @@
-﻿using ECommerceSystem.Domain.Entities;
+using ECommerceSystem.Domain.Entities;
 
 namespace ECommerceSystem.Application.Interfaces
 {
@@ -11,6 +11,7 @@ namespace ECommerceSystem.Application.Interfaces
         IRepository<Order, int> Orders { get; }
         IRepository<Category, int> Categories { get; }
         IRepository<CartItem, int> CartItems { get; }
+        IRepository<RefreshToken, Guid> RefreshTokens { get; }
 
         Task<int> SaveChangesAsync();
     }

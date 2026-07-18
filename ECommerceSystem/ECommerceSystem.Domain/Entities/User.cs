@@ -1,4 +1,4 @@
-﻿using ECommerceSystem.Domain.Enums;
+using ECommerceSystem.Domain.Enums;
 namespace ECommerceSystem.Domain.Entities
 {
     public class User
@@ -15,6 +15,7 @@ namespace ECommerceSystem.Domain.Entities
         public ICollection<Product> Products { get; set; } = new List<Product>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
     }
 }
