@@ -2,14 +2,10 @@ using ECommerceSystem.Application.DTOs.Auth;
 using ECommerceSystem.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace ECommerceSystem.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseApiController
     {
         private readonly IAuthService _authService;
 
@@ -67,7 +63,7 @@ namespace ECommerceSystem.Api.Controllers
             if (!result)
                 return BadRequest(AuthResponse.FailureResponse("Refresh token not found or already revoked."));
 
-            return Ok(AuthResponse.RegistrationSuccess("Logged out successfully."));
+            return Ok(AuthResponse.SuccessMessage("Logged out successfully."));
         }
 
         [HttpPost("logout-all")]
@@ -80,18 +76,7 @@ namespace ECommerceSystem.Api.Controllers
 
             await _authService.LogoutAllAsync(userId.Value);
 
-            return Ok(AuthResponse.RegistrationSuccess("All sessions have been logged out."));
-        }
-
-        private Guid? GetUserIdFromClaims()
-        {
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)
-                           ?? User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-                return null;
-
-            return userId;
+            return Ok(AuthResponse.SuccessMessage("All sessions have been logged out."));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace ECommerceSystem.Application.Interfaces
 {
@@ -13,5 +13,6 @@ namespace ECommerceSystem.Application.Interfaces
         void DeleteRange(IEnumerable<T> entities);
         Task<T?> FindAsync(Expression<Func<T, bool>> match);
         Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> match);
+        IQueryable<T> GetQueryable();
     }
 }

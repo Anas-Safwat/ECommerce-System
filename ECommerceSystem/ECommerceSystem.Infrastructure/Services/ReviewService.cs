@@ -2,6 +2,7 @@ using AutoMapper;
 using ECommerceSystem.Application.DTOs.Review;
 using ECommerceSystem.Application.Interfaces;
 using ECommerceSystem.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceSystem.Infrastructure.Services
 {
@@ -18,13 +19,20 @@ namespace ECommerceSystem.Infrastructure.Services
 
         public async Task<IEnumerable<ReviewResponse>> GetReviewsByProductIdAsync(int productId)
         {
-            var reviews = await _unitOfWork.Reviews.FindAllAsync(r => r.ProductId == productId);
+            var reviews = await _unitOfWork.Reviews.GetQueryable()
+                .Include(r => r.User)
+                .Where(r => r.ProductId == productId)
+                .ToListAsync();
+
             return _mapper.Map<IEnumerable<ReviewResponse>>(reviews);
         }
 
         public async Task<ReviewResponse?> GetReviewByIdAsync(int id)
         {
-            var review = await _unitOfWork.Reviews.GetByIdAsync(id);
+            var review = await _unitOfWork.Reviews.GetQueryable()
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
             if (review == null) return null;
 
             return _mapper.Map<ReviewResponse>(review);
@@ -39,7 +47,11 @@ namespace ECommerceSystem.Infrastructure.Services
             await _unitOfWork.Reviews.AddAsync(review);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<ReviewResponse>(review);
+            var createdReview = await _unitOfWork.Reviews.GetQueryable()
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.Id == review.Id);
+
+            return _mapper.Map<ReviewResponse>(createdReview);
         }
 
         public async Task<bool> UpdateReviewAsync(int id, Guid userId, UpdateReviewRequest request)

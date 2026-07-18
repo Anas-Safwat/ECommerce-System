@@ -2,7 +2,7 @@ using ECommerceSystem.Domain.Entities;
 
 namespace ECommerceSystem.Application.Interfaces
 {
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork : IDisposable, IAsyncDisposable
     {
         IRepository<User,Guid> Users { get; }
         IRepository<Review,int> Reviews { get; }

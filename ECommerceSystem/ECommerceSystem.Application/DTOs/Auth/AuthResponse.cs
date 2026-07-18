@@ -29,6 +29,15 @@ namespace ECommerceSystem.Application.DTOs.Auth
             };
         }
 
+        public static AuthResponse SuccessMessage(string message)
+        {
+            return new AuthResponse
+            {
+                Success = true,
+                Message = message
+            };
+        }
+
         public static AuthResponse FailureResponse(string message)
         {
             return new AuthResponse

@@ -2,15 +2,11 @@ using ECommerceSystem.Application.DTOs.Cart;
 using ECommerceSystem.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace ECommerceSystem.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
     [Authorize]
-    public class CartController : ControllerBase
+    public class CartController : BaseApiController
     {
         private readonly ICartService _cartService;
 
@@ -73,17 +69,6 @@ namespace ECommerceSystem.Api.Controllers
 
             await _cartService.ClearCartAsync(userId.Value);
             return NoContent();
-        }
-
-        private Guid? GetUserIdFromClaims()
-        {
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)
-                           ?? User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-                return null;
-
-            return userId;
         }
     }
 }

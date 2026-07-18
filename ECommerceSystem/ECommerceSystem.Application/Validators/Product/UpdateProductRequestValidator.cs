@@ -8,7 +8,7 @@ namespace ECommerceSystem.Application.Validators.Product
         public UpdateProductRequestValidator()
         {
             RuleFor(x => x.Name)
-                .MaximumLength(200).WithMessage("Product name cannot exceed 200 characters.")
+                .MaximumLength(50).WithMessage("Product name cannot exceed 50 characters.")
                 .When(x => x.Name != null);
 
             RuleFor(x => x.Description)

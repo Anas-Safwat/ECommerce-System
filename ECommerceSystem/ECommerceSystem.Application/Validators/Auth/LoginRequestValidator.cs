@@ -1,6 +1,7 @@
+using ECommerceSystem.Application.DTOs.Auth;
 using FluentValidation;
 
-namespace ECommerceSystem.Application.DTOs.Auth
+namespace ECommerceSystem.Application.Validators.Auth
 {
     public class LoginRequestValidator : AbstractValidator<LoginRequest>
     {

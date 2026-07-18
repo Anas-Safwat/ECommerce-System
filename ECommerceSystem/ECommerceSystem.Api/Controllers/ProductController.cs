@@ -2,14 +2,11 @@ using ECommerceSystem.Application.DTOs.Product;
 using ECommerceSystem.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using ECommerceSystem.Application.DTOs.Common;
 
 namespace ECommerceSystem.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductController : ControllerBase
+    public class ProductController : BaseApiController
     {
         private readonly IProductService _productService;
 
@@ -20,9 +17,9 @@ namespace ECommerceSystem.Api.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<ProductResponse>>> GetAllProducts()
+        public async Task<ActionResult<PagedResult<ProductResponse>>> GetAllProducts([FromQuery] ProductQueryParameters queryParams)
         {
-            var products = await _productService.GetAllProductsAsync();
+            var products = await _productService.GetAllProductsAsync(queryParams);
             return Ok(products);
         }
 
@@ -55,10 +52,9 @@ namespace ECommerceSystem.Api.Controllers
             var userId = GetUserIdFromClaims();
             if (userId == null) return Unauthorized();
 
-            // Admin can bypass seller check if we implemented it, but for now we enforce seller ownership
             var result = await _productService.UpdateProductAsync(id, userId.Value, request);
             if (!result)
-                return Forbid(); // Or NotFound depending on if it didn't exist or wasn't theirs
+                return Forbid();
 
             return NoContent();
         }
@@ -75,17 +71,6 @@ namespace ECommerceSystem.Api.Controllers
                 return Forbid();
 
             return NoContent();
-        }
-
-        private Guid? GetUserIdFromClaims()
-        {
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)
-                           ?? User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-                return null;
-
-            return userId;
         }
     }
 }

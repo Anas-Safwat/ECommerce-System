@@ -1,4 +1,4 @@
-﻿using ECommerceSystem.Application.Interfaces;
+using ECommerceSystem.Application.Interfaces;
 using ECommerceSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -60,5 +60,10 @@ namespace ECommerceSystem.Infrastructure.Repositories
         {
             return await _dbSet.Where(match).ToListAsync();
         }        
+
+        public IQueryable<T> GetQueryable()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }

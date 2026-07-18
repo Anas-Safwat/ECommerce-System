@@ -40,7 +40,7 @@ namespace ECommerceSystem.Infrastructure.Repositories
             _context.Dispose();
         }
 
-        public async Task DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
             await _context.DisposeAsync();
         }

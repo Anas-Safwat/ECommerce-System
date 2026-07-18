@@ -9,7 +9,7 @@ namespace ECommerceSystem.Application.Validators.Product
         {
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("Product name is required.")
-                .MaximumLength(200).WithMessage("Product name cannot exceed 200 characters.");
+                .MaximumLength(50).WithMessage("Product name cannot exceed 50 characters.");
 
             RuleFor(x => x.Description)
                 .NotEmpty().WithMessage("Description is required.")

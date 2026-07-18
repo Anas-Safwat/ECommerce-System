@@ -2,15 +2,11 @@ using ECommerceSystem.Application.DTOs.Order;
 using ECommerceSystem.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace ECommerceSystem.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
     [Authorize]
-    public class OrderController : ControllerBase
+    public class OrderController : BaseApiController
     {
         private readonly IOrderService _orderService;
 
@@ -64,24 +60,13 @@ namespace ECommerceSystem.Api.Controllers
         }
 
         [HttpPut("{id}/status")]
-        [Authorize(Policy = "AdminOnly")] // Can also be SellerOrAdmin
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusRequest request)
         {
             var result = await _orderService.UpdateOrderStatusAsync(id, request);
             if (!result) return NotFound();
 
             return NoContent();
-        }
-
-        private Guid? GetUserIdFromClaims()
-        {
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)
-                           ?? User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-                return null;
-
-            return userId;
         }
     }
 }

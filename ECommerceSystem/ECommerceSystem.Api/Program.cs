@@ -1,5 +1,4 @@
 using ECommerceSystem.Api.Filters;
-using ECommerceSystem.Application.DTOs.Auth;
 using ECommerceSystem.Application.Interfaces;
 using ECommerceSystem.Infrastructure.Data;
 using ECommerceSystem.Infrastructure.Repositories;
@@ -8,7 +7,11 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using System.Text;
+using ECommerceSystem.Api.Middleware;
+using ECommerceSystem.Api.Hubs;
+
 namespace ECommerceSystem.Api
 {
     public class Program
@@ -24,7 +27,7 @@ namespace ECommerceSystem.Api
                 options.Filters.Add<ValidationFilter>();
             });
 
-            builder.Services.AddSwaggerGen();
+ 
 
 
             // Disable built-in model validation to let FluentValidation handle it
@@ -34,7 +37,7 @@ namespace ECommerceSystem.Api
             });
 
             // Register all FluentValidation validators from the Application assembly
-            builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<ECommerceSystem.Application.Validators.Auth.RegisterRequestValidator>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -47,10 +50,14 @@ namespace ECommerceSystem.Api
             builder.Services.AddScoped<IReviewService, ReviewService>();
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderNotificationService, ECommerceSystem.Api.Services.OrderNotificationService>();
 
             builder.Services.AddAutoMapper(cfg => {
                 cfg.AddProfile<ECommerceSystem.Application.Mappings.MappingProfile>();
             });
+
+            builder.Services.AddMemoryCache();
+            builder.Services.AddSignalR();
 
             builder.Services.AddOpenApi();
 
@@ -81,6 +88,33 @@ namespace ECommerceSystem.Api
                 options.AddPolicy("SellerOrAdmin", policy => policy.RequireRole("Seller", "Admin"));
             });
 
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "ECommerce System API",
+                    Version = "v1",
+                    Description = "ECommerce System Backend API"
+                });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token.",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                c.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer"),
+            new List<string>()
+        }
+    });
+            });
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -89,6 +123,9 @@ namespace ECommerceSystem.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+
             app.UseHttpsRedirection();
 
 
@@ -97,6 +134,7 @@ namespace ECommerceSystem.Api
 
 
             app.MapControllers();
+            app.MapHub<OrderHub>("/orderHub");
 
             app.Run();
         }

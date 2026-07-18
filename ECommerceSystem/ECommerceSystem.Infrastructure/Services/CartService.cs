@@ -2,6 +2,7 @@ using AutoMapper;
 using ECommerceSystem.Application.DTOs.Cart;
 using ECommerceSystem.Application.Interfaces;
 using ECommerceSystem.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceSystem.Infrastructure.Services
 {
@@ -18,10 +19,11 @@ namespace ECommerceSystem.Infrastructure.Services
 
         public async Task<IEnumerable<CartItemResponse>> GetCartItemsAsync(Guid userId)
         {
-            var cartItems = await _unitOfWork.CartItems.FindAllAsync(c => c.UserId == userId);
-            
-            // To properly map ProductName and Price, Product must be loaded.
-            // If FindAllAsync doesn't include it, we manually populate it here or rely on lazy loading
+            var cartItems = await _unitOfWork.CartItems.GetQueryable()
+                .Include(c => c.Product)
+                .Where(c => c.UserId == userId)
+                .ToListAsync();
+
             var response = _mapper.Map<IEnumerable<CartItemResponse>>(cartItems);
             return response;
         }
@@ -45,8 +47,10 @@ namespace ECommerceSystem.Infrastructure.Services
 
             await _unitOfWork.SaveChangesAsync();
 
-            // Fetch with product to map correctly
-            var addedItem = await _unitOfWork.CartItems.GetByIdAsync(existingItem.Id);
+            var addedItem = await _unitOfWork.CartItems.GetQueryable()
+                .Include(c => c.Product)
+                .FirstOrDefaultAsync(c => c.Id == existingItem.Id);
+
             return _mapper.Map<CartItemResponse>(addedItem);
         }
 
