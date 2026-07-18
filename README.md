@@ -51,12 +51,10 @@ graph TD
 | **Database** | PostgreSQL |
 | **ORM** | Entity Framework Core 10 |
 | **Authentication** | JWT Bearer + Refresh Tokens |
-| **Password Hashing** | BCrypt |
 | **Real-Time** | SignalR |
 | **Validation** | FluentValidation |
 | **Object Mapping** | AutoMapper |
 | **Caching** | IMemoryCache |
-| **API Docs** | Swagger / OpenAPI |
 
 ---
 
@@ -257,7 +255,6 @@ sequenceDiagram
 | **Repository Pattern** | Generic `Repository<T, TKey>` |
 | **Unit of Work** | `UnitOfWork` with lazy-initialized repositories |
 | **DTO Pattern** | Separate Request/Response models per feature |
-| **Factory Method** | `AuthResponse.SuccessResponse()`, `.FailureResponse()` |
 | **Middleware** | Global exception handling |
 | **Action Filter** | FluentValidation integration |
 | **Observer (SignalR)** | Real-time order notifications |
